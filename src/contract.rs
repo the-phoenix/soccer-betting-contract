@@ -329,7 +329,7 @@ fn execute_refund(
         .into_iter()
         .fold(Uint128::zero(), |acc, stake| acc + stake);
     if refund_amount.is_zero() {
-        return Err(ContractError::NoWinningBet);
+        return Err(ContractError::NoRefundableStake);
     }
 
     ledger.refunded = true;

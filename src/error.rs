@@ -54,6 +54,9 @@ pub enum ContractError {
     #[error("refund already submitted")]
     AlreadyRefunded,
 
+    #[error("no refundable stake for sender")]
+    NoRefundableStake,
+
     #[error("market is not cancelled: {market_id}")]
     MarketNotCancelled { market_id: u64 },
 }

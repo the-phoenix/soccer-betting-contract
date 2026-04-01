@@ -390,3 +390,28 @@ fn cancelled_market_rejects_new_bets_and_settlement() {
         .unwrap_err();
     assert!(format!("{settle_err:?}").contains("already cancelled"));
 }
+
+#[test]
+fn refund_requires_refundable_stake() {
+    let mut app = setup_app();
+    let contract_addr = instantiate_contract(&mut app);
+    create_market(&mut app, &contract_addr);
+
+    app.execute_contract(
+        Addr::unchecked("admin"),
+        contract_addr.clone(),
+        &ExecuteMsg::CancelMarket { market_id: 1 },
+        &[],
+    )
+    .unwrap();
+
+    let refund_err = app
+        .execute_contract(
+            Addr::unchecked("alice"),
+            contract_addr,
+            &ExecuteMsg::Refund { market_id: 1 },
+            &[],
+        )
+        .unwrap_err();
+    assert!(format!("{refund_err:?}").contains("no refundable stake"));
+}
