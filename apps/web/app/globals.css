@@ -250,6 +250,16 @@ select {
   color: var(--rose);
 }
 
+.status-query {
+  background: rgba(105, 216, 255, 0.12);
+  color: var(--sky);
+}
+
+.status-execute {
+  background: rgba(157, 244, 203, 0.12);
+  color: var(--mint);
+}
+
 .field {
   display: grid;
   gap: 8px;
@@ -321,6 +331,49 @@ select {
   margin: 18px 0 0;
   color: var(--muted);
   line-height: 1.7;
+}
+
+.history-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.history-item {
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(160, 214, 255, 0.08);
+  background: rgba(8, 18, 28, 0.72);
+}
+
+.history-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.history-top time {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.history-item strong {
+  display: block;
+}
+
+.history-item p {
+  margin: 10px 0 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.history-hash {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--gold);
+  overflow-wrap: anywhere;
 }
 
 .feedback-bar {

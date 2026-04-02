@@ -18,6 +18,11 @@ import type {
   Outcome,
 } from "../lib/contract-types";
 import { formatTimestamp, parseInteger, shortenAddress } from "../lib/format";
+import {
+  pushActivityEntry,
+  readActivityHistory,
+  type ActivityEntry,
+} from "../lib/history";
 import { connectKeplr } from "../lib/keplr";
 
 const initialCreateMarket = {
@@ -56,6 +61,7 @@ export default function HomePage() {
   const [marketData, setMarketData] = useState<MarketResponse | null>(null);
   const [bettorData, setBettorData] = useState<BettorResponse | null>(null);
   const [marketList, setMarketList] = useState<MarketResponse[]>([]);
+  const [activity, setActivity] = useState<ActivityEntry[]>([]);
   const [createMarket, setCreateMarket] = useState(initialCreateMarket);
   const [placeBet, setPlaceBet] = useState(initialPlaceBet);
   const [settleMarket, setSettleMarket] = useState(initialSettle);
@@ -63,6 +69,8 @@ export default function HomePage() {
   const deferredMarketId = useDeferredValue(lookup.marketId);
 
   useEffect(() => {
+    setActivity(readActivityHistory());
+
     if (!hasRequiredChainConfig()) {
       setFeedback(
         "Missing chain configuration. Copy apps/web/.env.example to .env.local and fill in your chain values.",
@@ -116,6 +124,27 @@ export default function HomePage() {
     setSettleMarket((current) => ({ ...current, marketId }));
   }
 
+  function recordQuery(label: string, detail: string) {
+    setActivity(
+      pushActivityEntry({
+        kind: "query",
+        label,
+        detail,
+      }),
+    );
+  }
+
+  function recordExecution(label: string, detail: string, txHash?: string) {
+    setActivity(
+      pushActivityEntry({
+        kind: "execute",
+        label,
+        detail,
+        txHash,
+      }),
+    );
+  }
+
   function withExecute(
     message: ExecuteMessage,
     label: string,
@@ -129,6 +158,7 @@ export default function HomePage() {
         message,
         funds,
       );
+      recordExecution(label, JSON.stringify(message), result.transactionHash);
       setFeedback(`${label} submitted: ${result.transactionHash}`);
       await loadMarketExplorer();
     });
@@ -261,6 +291,7 @@ export default function HomePage() {
                   startTransition(() => {
                     setConfigData(response);
                   });
+                  recordQuery("Config query", "Loaded contract config snapshot.");
                   setFeedback("Config loaded.");
                 })
               }
@@ -291,6 +322,7 @@ export default function HomePage() {
                     setMarketData(response);
                     syncMarketId(String(response.market_id));
                   });
+                  recordQuery("Market query", `Loaded market ${response.market_id}.`);
                   setFeedback("Market loaded.");
                 })
               }
@@ -321,6 +353,10 @@ export default function HomePage() {
                   startTransition(() => {
                     setBettorData(response);
                   });
+                  recordQuery(
+                    "Bettor query",
+                    `Loaded bettor view for market ${response.market_id}.`,
+                  );
                   setFeedback("Bettor view loaded.");
                 })
               }
@@ -642,6 +678,30 @@ export default function HomePage() {
             </dl>
           ) : (
             <EmptyState label="Load a bettor record to inspect staking and claim state." />
+          )}
+        </DataCard>
+
+        <DataCard title="Activity History">
+          {activity.length > 0 ? (
+            <div className="history-list">
+              {activity.map((entry) => (
+                <article key={entry.id} className="history-item">
+                  <div className="history-top">
+                    <span className={`status-pill status-${entry.kind}`}>
+                      {entry.kind}
+                    </span>
+                    <time>{new Date(entry.timestamp).toLocaleString()}</time>
+                  </div>
+                  <strong>{entry.label}</strong>
+                  <p>{entry.detail}</p>
+                  {entry.txHash ? (
+                    <code className="history-hash">{entry.txHash}</code>
+                  ) : null}
+                </article>
+              ))}
+            </div>
+          ) : (
+            <EmptyState label="Run queries or execute transactions to build a local activity timeline." />
           )}
         </DataCard>
       </section>
