@@ -1,6 +1,6 @@
 # Soccer Betting CosmWasm Contract
 
-This project is now a real CosmWasm contract for pooled 1X2 soccer betting markets using a single native token denom.
+CosmWasm contract for pooled 1X2 soccer betting markets using a single native token denom.
 
 ## Features
 
