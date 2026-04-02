@@ -1,13 +1,17 @@
 :root {
-  --bg: #08131d;
-  --bg-soft: #0f2234;
-  --panel: rgba(9, 22, 34, 0.78);
-  --line: rgba(166, 219, 255, 0.18);
-  --text: #eef7ff;
-  --muted: #9cb9cf;
-  --sky: #6ad8ff;
-  --gold: #f4bf55;
-  --shadow: 0 36px 80px rgba(0, 0, 0, 0.32);
+  --bg: #07121c;
+  --bg-soft: #102131;
+  --panel: rgba(10, 23, 35, 0.78);
+  --panel-strong: rgba(14, 30, 46, 0.92);
+  --line: rgba(160, 214, 255, 0.16);
+  --line-strong: rgba(249, 191, 80, 0.24);
+  --text: #f2f8fc;
+  --muted: #9bb4c7;
+  --sky: #69d8ff;
+  --gold: #f9bf50;
+  --rose: #ff7b6b;
+  --mint: #9df4cb;
+  --shadow: 0 32px 80px rgba(0, 0, 0, 0.34);
 }
 
 * {
@@ -23,81 +27,264 @@ body {
 body {
   color: var(--text);
   background:
-    radial-gradient(circle at 10% 10%, rgba(106, 216, 255, 0.16), transparent 25%),
-    radial-gradient(circle at 90% 15%, rgba(244, 191, 85, 0.14), transparent 18%),
-    linear-gradient(180deg, #08131d 0%, #0a1620 55%, #061017 100%);
+    radial-gradient(circle at 12% 12%, rgba(105, 216, 255, 0.14), transparent 24%),
+    radial-gradient(circle at 88% 18%, rgba(249, 191, 80, 0.16), transparent 18%),
+    linear-gradient(180deg, #07121c 0%, #091723 46%, #050d14 100%);
   font-family: Georgia, "Times New Roman", serif;
 }
 
-.shell {
-  width: min(1160px, calc(100% - 32px));
-  margin: 0 auto;
-  padding: 52px 0 72px;
+button,
+input,
+select {
+  font: inherit;
 }
 
-.hero {
-  padding: 32px;
-  border-radius: 30px;
+.dashboard-shell {
+  width: min(1280px, calc(100% - 28px));
+  margin: 0 auto;
+  padding: 32px 0 64px;
+}
+
+.masthead {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.85fr);
+  gap: 18px;
+  padding: 28px;
   border: 1px solid var(--line);
-  background: linear-gradient(160deg, rgba(15, 34, 52, 0.94), rgba(8, 19, 29, 0.82));
+  border-radius: 30px;
+  background: linear-gradient(155deg, rgba(14, 30, 46, 0.95), rgba(7, 18, 28, 0.82));
   box-shadow: var(--shadow);
 }
 
 .eyebrow {
-  margin: 0 0 16px;
+  margin: 0 0 14px;
   color: var(--gold);
   text-transform: uppercase;
-  letter-spacing: 0.26em;
+  letter-spacing: 0.24em;
   font-size: 0.78rem;
 }
 
-.hero h1 {
+.masthead h1 {
   margin: 0;
-  max-width: 12ch;
-  font-size: clamp(3rem, 8vw, 6rem);
+  max-width: 13ch;
+  font-size: clamp(2.9rem, 7vw, 5.9rem);
   line-height: 0.95;
 }
 
 .lede {
-  max-width: 46rem;
-  margin: 24px 0 0;
+  max-width: 48rem;
+  margin: 22px 0 0;
   color: var(--muted);
-  font-size: 1.06rem;
-  line-height: 1.7;
+  font-size: 1.04rem;
+  line-height: 1.72;
 }
 
-.grid {
+.masthead-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.status-list,
+.data-list {
+  display: grid;
+  gap: 12px;
+}
+
+.status-list div,
+.data-list div {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(160, 214, 255, 0.08);
+}
+
+.status-list dt,
+.data-list dt {
+  color: var(--muted);
+}
+
+.status-list dd,
+.data-list dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.console-grid,
+.data-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
-  margin-top: 22px;
+  margin-top: 18px;
 }
 
-.panel {
+.console-card,
+.data-card {
   padding: 22px;
-  border-radius: 24px;
+  border-radius: 26px;
   border: 1px solid var(--line);
   background: var(--panel);
-  backdrop-filter: blur(14px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(12px);
 }
 
-.panel h2 {
-  margin: 0 0 10px;
-  font-size: 1.25rem;
-}
-
-.panel p {
+.card-heading h2 {
   margin: 0;
+  font-size: 1.3rem;
+}
+
+.card-heading p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.62;
+}
+
+.stack,
+.form-grid {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.compact-group {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field span {
+  color: var(--muted);
+  font-size: 0.88rem;
+  letter-spacing: 0.01em;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid rgba(160, 214, 255, 0.12);
+  border-radius: 14px;
+  background: rgba(8, 18, 28, 0.9);
+  color: var(--text);
+}
+
+.field input::placeholder {
+  color: rgba(155, 180, 199, 0.46);
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.primary-button,
+.ghost-button {
+  min-height: 46px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 150ms ease, border-color 150ms ease, background 150ms ease;
+}
+
+.primary-button {
+  background: linear-gradient(135deg, var(--gold), #f1d991);
+  color: #1b1305;
+  font-weight: 700;
+}
+
+.ghost-button {
+  background: rgba(105, 216, 255, 0.08);
+  border-color: rgba(105, 216, 255, 0.12);
+  color: var(--sky);
+}
+
+.primary-button:hover,
+.ghost-button:hover {
+  transform: translateY(-1px);
+}
+
+.primary-button:disabled,
+.ghost-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}
+
+.empty-state {
+  margin: 18px 0 0;
   color: var(--muted);
   line-height: 1.7;
 }
 
-@media (max-width: 900px) {
-  .grid {
+.feedback-bar {
+  margin-top: 18px;
+  padding: 18px 22px;
+  border: 1px solid var(--line-strong);
+  border-radius: 24px;
+  background: linear-gradient(140deg, rgba(249, 191, 80, 0.08), rgba(10, 23, 35, 0.88));
+}
+
+.feedback-label {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: var(--mint);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.74rem;
+}
+
+.feedback-bar p {
+  margin: 0;
+  color: var(--text);
+}
+
+@media (max-width: 1080px) {
+  .masthead,
+  .console-grid,
+  .data-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .dashboard-shell {
+    width: min(100% - 20px, 1280px);
+    padding-top: 20px;
+  }
+
+  .masthead,
+  .console-card,
+  .data-card {
+    padding: 18px;
+  }
+
+  .form-grid,
+  .compact-group {
     grid-template-columns: 1fr;
   }
 
-  .hero {
-    padding: 24px;
+  .status-list div,
+  .data-list div {
+    grid-template-columns: 1fr;
+  }
+
+  .masthead h1 {
+    font-size: clamp(2.4rem, 12vw, 4rem);
   }
 }
