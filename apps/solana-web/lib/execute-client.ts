@@ -15,6 +15,7 @@ import {
   queryConfig,
 } from "./anchor-client";
 import type { Outcome } from "./contract-types";
+import { parsePublicKey } from "./format";
 import type { SolanaWallet } from "./wallet";
 
 const INITIALIZE_IX = Buffer.from("afaf6d1f0d989bed", "hex");
@@ -57,7 +58,11 @@ export async function initializeProgram(
       programId: getProgramId(),
       keys: [
         { pubkey: configAddress, isSigner: false, isWritable: true },
-        { pubkey: new PublicKey(signerAddress), isSigner: true, isWritable: true },
+        {
+          pubkey: requirePublicKey(signerAddress, "signer address"),
+          isSigner: true,
+          isWritable: true,
+        },
         { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
       ],
       data: Buffer.concat([
@@ -82,7 +87,11 @@ export async function createMarket(args: CreateMarketArgs, wallet: SolanaWallet)
       keys: [
         { pubkey: configAddress, isSigner: false, isWritable: true },
         { pubkey: marketAddress, isSigner: false, isWritable: true },
-        { pubkey: new PublicKey(args.signerAddress), isSigner: true, isWritable: true },
+        {
+          pubkey: requirePublicKey(args.signerAddress, "signer address"),
+          isSigner: true,
+          isWritable: true,
+        },
         { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
       ],
       data: Buffer.concat([
@@ -92,7 +101,7 @@ export async function createMarket(args: CreateMarketArgs, wallet: SolanaWallet)
         encodeString(args.awayTeam),
         encodeI64(args.kickoffTs),
         encodeI64(args.closeTs),
-        new PublicKey(args.oracle).toBuffer(),
+        requirePublicKey(args.oracle, "oracle address").toBuffer(),
       ]),
     }),
   });
@@ -107,7 +116,7 @@ export async function placeBet(
 ) {
   const [configAddress] = findConfigAddress();
   const [marketAddress] = findMarketAddress(marketId);
-  const bettorAddress = new PublicKey(signerAddress);
+  const bettorAddress = requirePublicKey(signerAddress, "signer address");
   const [bettorLedgerAddress] = findBettorLedgerAddress(marketAddress, bettorAddress);
 
   return signAndSend({
@@ -149,7 +158,11 @@ export async function settleMarket(
       keys: [
         { pubkey: configAddress, isSigner: false, isWritable: true },
         { pubkey: marketAddress, isSigner: false, isWritable: true },
-        { pubkey: new PublicKey(signerAddress), isSigner: true, isWritable: false },
+        {
+          pubkey: requirePublicKey(signerAddress, "signer address"),
+          isSigner: true,
+          isWritable: false,
+        },
       ],
       data: Buffer.concat([
         SETTLE_MARKET_IX,
@@ -176,7 +189,11 @@ export async function cancelMarket(
       keys: [
         { pubkey: configAddress, isSigner: false, isWritable: false },
         { pubkey: marketAddress, isSigner: false, isWritable: true },
-        { pubkey: new PublicKey(signerAddress), isSigner: true, isWritable: false },
+        {
+          pubkey: requirePublicKey(signerAddress, "signer address"),
+          isSigner: true,
+          isWritable: false,
+        },
       ],
       data: Buffer.concat([CANCEL_MARKET_IX, encodeU64(marketId)]),
     }),
@@ -189,7 +206,7 @@ export async function claim(
   marketId: number,
 ) {
   const [marketAddress] = findMarketAddress(marketId);
-  const bettorAddress = new PublicKey(signerAddress);
+  const bettorAddress = requirePublicKey(signerAddress, "signer address");
   const [bettorLedgerAddress] = findBettorLedgerAddress(marketAddress, bettorAddress);
 
   return signAndSend({
@@ -213,7 +230,7 @@ export async function refund(
   marketId: number,
 ) {
   const [marketAddress] = findMarketAddress(marketId);
-  const bettorAddress = new PublicKey(signerAddress);
+  const bettorAddress = requirePublicKey(signerAddress, "signer address");
   const [bettorLedgerAddress] = findBettorLedgerAddress(marketAddress, bettorAddress);
 
   return signAndSend({
@@ -241,7 +258,11 @@ export async function withdrawFees(signerAddress: string, wallet: SolanaWallet) 
       programId: getProgramId(),
       keys: [
         { pubkey: configAddress, isSigner: false, isWritable: true },
-        { pubkey: new PublicKey(signerAddress), isSigner: true, isWritable: true },
+        {
+          pubkey: requirePublicKey(signerAddress, "signer address"),
+          isSigner: true,
+          isWritable: true,
+        },
       ],
       data: WITHDRAW_FEES_IX,
     }),
@@ -256,7 +277,7 @@ async function signAndSend({ wallet, signerAddress, instruction }: SignAndSendAr
   const connection = getConnection();
   const latestBlockhash = await connection.getLatestBlockhash("confirmed");
   const transaction = new Transaction({
-    feePayer: new PublicKey(signerAddress),
+    feePayer: requirePublicKey(signerAddress, "signer address"),
     blockhash: latestBlockhash.blockhash,
     lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
   }).add(instruction);
@@ -290,7 +311,10 @@ function encodeOptionPublicKey(value?: string) {
   if (!value) {
     return Buffer.from([0]);
   }
-  return Buffer.concat([Buffer.from([1]), new PublicKey(value).toBuffer()]);
+  return Buffer.concat([
+    Buffer.from([1]),
+    requirePublicKey(value, "admin address").toBuffer(),
+  ]);
 }
 
 function encodeString(value: string) {
@@ -324,4 +348,12 @@ function encodeI64(value: number | bigint) {
   const buffer = Buffer.alloc(8);
   buffer.writeBigInt64LE(BigInt(value));
   return buffer;
+}
+
+function requirePublicKey(value: string, field: string) {
+  try {
+    return new PublicKey(parsePublicKey(value, field));
+  } catch {
+    throw new Error(`Invalid ${field}.`);
+  }
 }

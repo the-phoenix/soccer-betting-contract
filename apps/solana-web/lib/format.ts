@@ -26,6 +26,14 @@ export function parseInteger(value: string, field: string) {
   return parsed;
 }
 
+export function parsePublicKey(value: string, field: string) {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    throw new Error(`Missing ${field}.`);
+  }
+  return trimmed;
+}
+
 export function lamportsToSol(value: string) {
   const lamports = Number(value);
   if (Number.isNaN(lamports)) {

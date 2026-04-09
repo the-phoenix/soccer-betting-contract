@@ -9,6 +9,7 @@ import type {
   MarketStatus,
   Outcome,
 } from "./contract-types";
+import { parsePublicKey } from "./format";
 
 const CONFIG_DISCRIMINATOR = Buffer.from("9b0caae01efacc82", "hex");
 const MARKET_DISCRIMINATOR = Buffer.from("dbbed53700e3c69a", "hex");
@@ -22,10 +23,7 @@ export function getConnection() {
 }
 
 export function getProgramId() {
-  if (!appConfig.programId) {
-    throw new Error("NEXT_PUBLIC_PROGRAM_ID is not configured.");
-  }
-  return new PublicKey(appConfig.programId);
+  return parseSolanaAddress(appConfig.programId, "NEXT_PUBLIC_PROGRAM_ID");
 }
 
 export function findConfigAddress() {
@@ -95,7 +93,7 @@ export async function queryMarkets(limit = appConfig.defaultMarketLimit) {
 
 export async function queryBettor(marketId: number, bettor: string) {
   const connection = getConnection();
-  const bettorAddress = new PublicKey(bettor);
+  const bettorAddress = parseSolanaAddress(bettor, "bettor address");
   const [marketAddress] = findMarketAddress(marketId);
   const [ledgerAddress] = findBettorLedgerAddress(marketAddress, bettorAddress);
   const account = await connection.getAccountInfo(ledgerAddress);
@@ -257,6 +255,14 @@ function parseOutcome(value: number): Outcome {
       return "away_win";
     default:
       throw new Error(`Unknown outcome: ${value}`);
+  }
+}
+
+function parseSolanaAddress(value: string, field: string) {
+  try {
+    return new PublicKey(parsePublicKey(value, field));
+  } catch {
+    throw new Error(`Invalid ${field}.`);
   }
 }
 
