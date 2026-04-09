@@ -115,16 +115,32 @@ export default function HomePage() {
   }
 
   async function loadExplorer() {
-    const [config, markets] = await Promise.all([queryConfig(), queryMarkets()]);
-    setConfigData(config);
-    setMarketList(markets);
+    try {
+      const [config, markets] = await Promise.all([queryConfig(), queryMarkets()]);
+      setConfigData(config);
+      setMarketList(markets);
 
-    if (!marketData && markets[0]) {
-      setMarketData(markets[0]);
-      syncMarketId(String(markets[0].market_id));
+      if (!marketData && markets[0]) {
+        setMarketData(markets[0]);
+        syncMarketId(String(markets[0].market_id));
+      }
+
+      setFeedback(`Loaded ${markets.length} recent markets from Solana.`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      if (message.includes("Config account was not found")) {
+        setConfigData(null);
+        setMarketData(null);
+        setMarketList([]);
+        setBettorData(null);
+        setFeedback(
+          "Solana program is not initialized yet. Connect a wallet and use Initialize before creating markets.",
+        );
+        return;
+      }
+
+      throw error;
     }
-
-    setFeedback(`Loaded ${markets.length} recent markets from Solana.`);
   }
 
   function syncMarketId(marketId: string) {
