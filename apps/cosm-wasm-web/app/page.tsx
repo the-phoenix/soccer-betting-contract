@@ -73,7 +73,7 @@ export default function HomePage() {
 
     if (!hasRequiredChainConfig()) {
       setFeedback(
-        "Missing chain configuration. Copy apps/web/.env.example to .env.local and fill in your chain values.",
+        "Missing chain configuration. Copy apps/cosm-wasm-web/.env.example to .env.local and fill in your chain values.",
       );
       return;
     }

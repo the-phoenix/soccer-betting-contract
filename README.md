@@ -6,7 +6,7 @@ CosmWasm contract and Next.js frontend for pooled 1X2 soccer betting markets usi
 
 - `contracts/soccer-betting-contract`
   CosmWasm smart contract for pooled 1X2 soccer betting, settlement, cancellation, claims, and refunds.
-- `apps/web`
+- `apps/cosm-wasm-web`
   Next.js frontend for market exploration, wallet actions, queries, and operator flows.
 
 ## Current Status
@@ -24,7 +24,7 @@ cargo run --bin schema
 ## Frontend Quick Start
 
 ```bash
-cd apps/web
+cd apps/cosm-wasm-web
 cp .env.example .env.local
 npm install
 npm run dev
