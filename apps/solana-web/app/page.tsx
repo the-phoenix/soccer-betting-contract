@@ -19,6 +19,7 @@ import {
   cancelMarket,
   claim,
   createMarket,
+  initializeProgram,
   placeBet,
   refund,
   settleMarket,
@@ -44,6 +45,11 @@ const initialCreateMarket = {
   kickoffTs: "",
   closeTs: "",
   oracle: "",
+};
+
+const initialInitialize = {
+  treasuryBps: "250",
+  admin: "",
 };
 
 const initialPlaceBet = {
@@ -74,6 +80,7 @@ export default function HomePage() {
   const [bettorData, setBettorData] = useState<BettorResponse | null>(null);
   const [marketList, setMarketList] = useState<MarketResponse[]>([]);
   const [activity, setActivity] = useState<ActivityEntry[]>([]);
+  const [initializeForm, setInitializeForm] = useState(initialInitialize);
   const [createMarketForm, setCreateMarketForm] = useState(initialCreateMarket);
   const [placeBetForm, setPlaceBetForm] = useState(initialPlaceBet);
   const [settleForm, setSettleForm] = useState(initialSettle);
@@ -216,6 +223,10 @@ export default function HomePage() {
                   ...current,
                   oracle: current.oracle || connection.address,
                 }));
+                setInitializeForm((current) => ({
+                  ...current,
+                  admin: current.admin || connection.address,
+                }));
                 setFeedback(`Wallet connected: ${connection.address}`);
               })
             }
@@ -347,6 +358,55 @@ export default function HomePage() {
           <div className="card-heading">
             <h2>Write Actions</h2>
             <p>These controls submit transactions directly to the Anchor program.</p>
+          </div>
+
+          <div className="compact-group">
+            <label className="field">
+              <span>Treasury Bps</span>
+              <input
+                value={initializeForm.treasuryBps}
+                onChange={(event) =>
+                  setInitializeForm((current) => ({
+                    ...current,
+                    treasuryBps: event.target.value,
+                  }))
+                }
+              />
+            </label>
+            <label className="field">
+              <span>Admin</span>
+              <input
+                placeholder="Defaults to connected wallet"
+                value={initializeForm.admin}
+                onChange={(event) =>
+                  setInitializeForm((current) => ({
+                    ...current,
+                    admin: event.target.value,
+                  }))
+                }
+              />
+            </label>
+            <div className="field">
+              <span>Program Setup</span>
+              <div className="button-row inline-actions">
+                <button
+                  className="primary-button"
+                  disabled={busyAction === "Initialize program"}
+                  onClick={() =>
+                    withExecute("Initialize program", (connectedWallet, address) =>
+                      initializeProgram(
+                        address,
+                        connectedWallet,
+                        parseInteger(initializeForm.treasuryBps, "treasury bps"),
+                        initializeForm.admin || undefined,
+                      ),
+                    )
+                  }
+                >
+                  Initialize
+                </button>
+              </div>
+            </div>
           </div>
 
           <div className="form-grid">
